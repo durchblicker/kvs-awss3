@@ -13,6 +13,7 @@ Abstract.bequeath(Amazon);
 function Amazon(options) {
   Abstract.call(this);
   this.client = knox.createClient(options);
+  this.type = options.type || 'application/octet-stream';
 }
 
 Amazon.prototype._get = function(name, callback) {
@@ -21,24 +22,17 @@ Amazon.prototype._get = function(name, callback) {
     if (res.statusCode == 404) return callback(null, null);
     if (res.statusCode == 410) return callback(null, null);
     if (res.statusCode >= 300) return callback(new Error('HTTP('+res.statusCode+')'));
-
-    var dat=[], len=0;
-    res.on('data', function(chunk) {
-      dat.push(chunk);
-      len+=chunk.length;
-    });
-    res.on('end', function() {
-      callback(null, Buffer.concat(dat, len));
-    });
-    res.on('error', callback);
+    slurp(res, callback);
   }).end();
 };
 
 Amazon.prototype._set = function(name, value, callback) {
   value = Buffer.isBuffer(value) ? value : new Buffer(String(value), 'utf-8');
-  this.client.put('/'+name).on('response', function(res) {
-    if (res.statusCode >= 300) return callback(new Error('HTTP('+res.statusCode+')'));
-    callback(null, res.statusCode);
+  this.client.put('/'+name, { 'Content-Length':value.length, 'Content-Type':this.type }).on('response', function(res) {
+    slurp(res, function(err, val) {
+      if (res.statusCode >= 300) return callback(new Error('HTTP('+res.statusCode+')'), val.toString());
+      callback(null, res.statusCode);
+    });
   }).end(value);
 };
 
@@ -59,3 +53,15 @@ Amazon.prototype._list = function(name, callback) {
     });
   });
 };
+
+function slurp(res, cb) {
+  var dat=[], len=0;
+  res.on('data', function(chunk) {
+    dat.push(chunk);
+    len+=chunk.length;
+  });
+  res.on('end', function() {
+    cb(null, Buffer.concat(dat, len));
+  });
+  res.on('error', cb);
+}
