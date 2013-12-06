@@ -1,6 +1,6 @@
 {
   "name": "kvs-awss3",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "using Amazon S3 as a KVS",
   "main": "aws.js",
   "scripts": {

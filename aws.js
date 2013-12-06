@@ -5,6 +5,7 @@
 'use strict';
 
 module.exports = Amazon;
+module.exports.kvt = 'store';
 
 var knox = require('knox');
 var Abstract = require('kvs-abstract');
