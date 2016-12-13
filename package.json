@@ -21,7 +21,7 @@
     "url": "https://github.com/pipobscure/kvs-awss3/issues"
   },
   "dependencies": {
-    "kvs-abstract": "~0.1.0",
+    "kvs-abstract": "git+https://github.com/durchblicker/kvs-abstract",
     "knox": "~0.8.8"
   },
   "devDependencies": {
