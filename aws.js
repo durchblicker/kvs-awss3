@@ -27,7 +27,7 @@ function Amazon (options) {
 }
 
 Amazon.prototype._get = function (name, callback) {
-	this.S3.getObject({Key: '/' + name}, function (err, data) {
+	this.S3.getObject({Key: name}, function (err, data) {
 		if (err) {
 			if (err.statusCode >= 500) return callback(new Error('HTTP(' + err.statusCode + ')'));
 			if (err.statusCode == 404) return callback(null, null);
@@ -44,7 +44,7 @@ Amazon.prototype._set = function (name, value, callback) {
 	value = Buffer.isBuffer(value) ? value : Buffer.from(String(value), 'utf-8');
 	let params = {
 		Body: value,
-		Key: '/' + name,
+		Key: name,
 		ContentLength: value.length,
 		ContentType: this.type
 	};
@@ -59,7 +59,7 @@ Amazon.prototype._set = function (name, value, callback) {
 };
 
 Amazon.prototype._remove = function (name, callback) {
-	this.S3.deleteObject({Key: '/' + name}, function (err, data) {
+	this.S3.deleteObject({Key: name}, function (err, data) {
 		if (err) {
 			if (err.statusCode >= 300) return callback(new Error('HTTP(' + err.statusCode + ')'));
 			callback(new Error(err));
@@ -71,7 +71,7 @@ Amazon.prototype._remove = function (name, callback) {
 
 Amazon.prototype._list = function (name, callback) {
 	this.S3.listObjects({
-		Prefix: '/' + name
+		Prefix: name
 	}, function (err, data) {
 		if (err) return callback(err);
 		if (!data || !data.Contents) return callback(new Error('no data'));
