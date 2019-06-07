@@ -29,10 +29,10 @@ function Amazon (options) {
 Amazon.prototype._get = function (name, callback) {
 	this.S3.getObject({Key: '/' + name}, function (err, data) {
 		if (err) {
-			if (err.statusCode >= 500) return callback(new Error('HTTP(' + res.statusCode + ')'));
+			if (err.statusCode >= 500) return callback(new Error('HTTP(' + err.statusCode + ')'));
 			if (err.statusCode == 404) return callback(null, null);
 			if (err.statusCode == 410) return callback(null, null);
-			if (err.statusCode >= 300) return callback(new Error('HTTP(' + res.statusCode + ')'));
+			if (err.statusCode >= 300) return callback(new Error('HTTP(' + err.statusCode + ')'));
 			callback(new Error(err));
 		} else {
 			callback(null, data.Body);
@@ -61,10 +61,10 @@ Amazon.prototype._set = function (name, value, callback) {
 Amazon.prototype._remove = function (name, callback) {
 	this.S3.deleteObject({Key: '/' + name}, function (err, data) {
 		if (err) {
-			if (res.statusCode >= 300) return callback(new Error('HTTP(' + res.statusCode + ')'));
+			if (err.statusCode >= 300) return callback(new Error('HTTP(' + err.statusCode + ')'));
 			callback(new Error(err));
 		} else {
-			callback();
+			callback(null, 204); //emulate previous behaviour
 		}
 	});
 };
