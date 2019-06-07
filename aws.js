@@ -81,15 +81,3 @@ Amazon.prototype._list = function (name, callback) {
 		});
 	});
 };
-
-function slurp (res, cb) {
-	var dat = [], len = 0;
-	res.on('data', function (chunk) {
-		dat.push(chunk);
-		len += chunk.length;
-	});
-	res.on('end', function () {
-		cb(null, Buffer.concat(dat, len));
-	});
-	res.on('error', cb);
-}
